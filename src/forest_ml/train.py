@@ -2,7 +2,10 @@ from pathlib import Path
 
 import click
 import pandas as pd
+
+# from forest_ml.src.forest_ml.pipeline import create_pipeline
 from .data import get_dataset
+from .pipeline import create_pipeline
 
 @click.command()
 @click.option(
@@ -42,4 +45,8 @@ def train(
         dataset_path,
         random_state,
         test_split_ratio)
+    print(features_train.head(5))
+    pipeline = create_pipeline(use_scaler=True)
+    e = pd.DataFrame(pipeline.fit_transform(features_train))
+    print(e.head(5))
 

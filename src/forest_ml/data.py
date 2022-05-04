@@ -14,7 +14,7 @@ def get_dataset(
 
     data = pd.read_csv(csv_path)
 
-    click.echo(f"Dataset shape: {data.shape}.")
+    # click.echo(f"Dataset shape: {data.shape}.")
 
     features = data.drop(columns=["Cover_Type"])    
     target = data['Cover_Type']
