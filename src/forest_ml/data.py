@@ -6,7 +6,7 @@ import pandas as pd
 import click
 from sklearn.model_selection import train_test_split
 
-def dataset(
+def get_dataset(
     csv_path: Path, 
     random_state: int, 
     test_split_ratio: float
@@ -16,12 +16,13 @@ def dataset(
 
     click.echo(f"Dataset shape: {data.shape}.")
 
-    features = data.drop(columns=['target'])    
-    target = data['target']
+    features = data.drop(columns=["Cover_Type"])    
+    target = data['Cover_Type']
 
     features_train, features_val, target_train, target_val = train_test_split(
         features, target, test_size=test_split_ratio, random_state=random_state
     )
 
     return features_train, features_val, target_train, target_val
+
 
