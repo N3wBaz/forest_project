@@ -1,6 +1,8 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+
 
 
 def create_pipeline(
@@ -8,12 +10,12 @@ def create_pipeline(
 ) -> Pipeline:
     pipeline_steps = []
     if use_scaler:
-        pipeline_steps.append(("scaler", StandardScaler()))
+        pipeline_steps.append(("scaler", MinMaxScaler()))
     pipeline_steps.append(
         (
             "classifier",
             LogisticRegression(
-                random_state=random_state, max_iter=max_iter, C=logreg_C, solver='sag'
+                random_state=random_state, max_iter=max_iter, C=logreg_C, 
             ),
         )
     )
