@@ -28,3 +28,11 @@ def get_dataset(
     return features, target
 
 
+def get_data(
+    csv_path: Path
+    ) -> Tuple[pd.DataFrame]:
+
+    data = pd.read_csv(csv_path)
+
+    return data
+

@@ -6,15 +6,18 @@ import pandas as pd
 import sys
 import os
 import warnings
+import pandas_profiling
+
 
 
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
-from sklearn.metrics import make_scorer
+# from sklearn.metrics import make_scorer
 from sklearn.metrics import f1_score
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold 
+# from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import StratifiedKFold 
 from .data import get_dataset
+from .data import get_data
 from .pipeline import create_pipeline
 
 
@@ -71,6 +74,13 @@ from .pipeline import create_pipeline
     show_default=True,
 )
 
+@click.option(
+    "--kf-part",
+    default=5,
+    type=int,
+    show_default=True,
+)
+
 
 def train(
     dataset_path: Path,
@@ -80,6 +90,7 @@ def train(
     use_scaler: bool,
     max_iter: int,
     logreg_c: float,
+    kf_part: int,
 ) -> None:
     # features_train, features_val, target_train, target_val = get_dataset(
     #     dataset_path,
@@ -91,15 +102,13 @@ def train(
     pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
 
 
-
-    kf = KFold(n_splits=5, random_state=None)
-    # model = LogisticRegression(solver= 'liblinear')
+    kf = StratifiedKFold(n_splits=kf_part, random_state=None)
     
     acc_score = []
     roc_score = []
     f_score = []
     
-    for train_index , test_index in kf.split(features):
+    for train_index , test_index in kf.split(features, target):
         X_train , X_test = features.iloc[train_index,:],features .iloc[test_index,:]
         y_train , y_test = target[train_index] , target[test_index]
         if not sys.warnoptions:
@@ -109,17 +118,20 @@ def train(
 
         pred_values = pipeline.predict(X_test)
         
-        
         acc = accuracy_score(pred_values , y_test)
-        roc_auc = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr',)
+        roc_auc = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr', average="macro")
         f_measure = f1_score(y_test, pred_values,  average='macro')
+
         roc_score.append(roc_auc)
         acc_score.append(acc)
         f_score.append(f_measure)
+    
+    dump(pipeline, save_model_path)
+    click.echo(f"Model is saved to {save_model_path}.")
 
-    click.echo(f"Roc auc score {roc_score}.") 
-    click.echo(f"Accuracy score {acc_score}.") 
-    click.echo(f"F score {f_score}.") 
+    click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
+    click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
+    click.echo(f"F score {sum(f_score)/len(f_score)}.") 
 
     # https://towardsdatascience.com/complete-guide-to-pythons-cross-validation-with-examples-a9676b5cac12
     # почитать про КФОЛД
@@ -160,3 +172,28 @@ def train(
     # accuracy = accuracy_score(pipeline.predict(features), target)
     # click.echo(f"Accuracy: {accuracy}.")
 
+@click.command()
+@click.option(
+    "-d",
+    "--dataset-path",
+    default="data/train.csv",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    show_default=True
+)
+
+def eda(
+    dataset_path: Path,
+    ) -> None:
+
+    data = get_data(dataset_path)
+
+    data = get_data(dataset_path)
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
+        os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+        profile = data.profile_report(title='Pandas Profiling Report')
+    # profile.to_file(outputfile="data/profiling.html")
+    # print(data)
+    profile.to_file("Forest_report.html")
+
+    # data.profile_report()

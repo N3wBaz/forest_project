@@ -6,7 +6,7 @@ authors = ["Ruslan Romanov <ftnewt@gmail.com>"]
 
 [tool.poetry.scripts]
 train = "forest_ml.train:train"
-
+eda = "forest_ml.train:eda"
 
 [tool.poetry.dependencies]
 python = "^3.8poetry"
@@ -14,6 +14,7 @@ pandas = "1.3.5"
 click = "^8.1.3"
 poetry = "^1.1.13"
 scikit-learn = "^1.0.2"
+pandas-profiling = "^3.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
