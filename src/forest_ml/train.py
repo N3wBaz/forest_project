@@ -14,7 +14,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
 # from sklearn.metrics import make_scorer
 from sklearn.metrics import f1_score
-# from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 from sklearn.model_selection import StratifiedKFold 
 from .data import get_dataset
 from .data import get_data
@@ -102,36 +102,52 @@ def train(
     pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
 
 
-    kf = StratifiedKFold(n_splits=kf_part, random_state=None)
+    # kf = StratifiedKFold(n_splits=kf_part, random_state=None)
     
-    acc_score = []
-    roc_score = []
-    f_score = []
-    
-    for train_index , test_index in kf.split(features, target):
-        X_train , X_test = features.iloc[train_index,:],features .iloc[test_index,:]
-        y_train , y_test = target[train_index] , target[test_index]
-        if not sys.warnoptions:
-            warnings.simplefilter("ignore")
-            os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
-            pipeline.fit(X_train,y_train)
 
-        pred_values = pipeline.predict(X_test)
+    # K-fold валидация рабочая с 3-мя метриками 
+
+    # acc_score = []
+    # roc_score = []
+    # f_score = []
+    
+    # for train_index , test_index in kf.split(features, target):
+    #     X_train , X_test = features.iloc[train_index,:],features .iloc[test_index,:]
+    #     y_train , y_test = target[train_index] , target[test_index]
+    #     if not sys.warnoptions:
+    #         warnings.simplefilter("ignore")
+    #         os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+    #         pipeline.fit(X_train,y_train)
+
+    #     pred_values = pipeline.predict(X_test)
         
-        acc = accuracy_score(pred_values , y_test)
-        roc_auc = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr', average="macro")
-        f_measure = f1_score(y_test, pred_values,  average='macro')
+    #     acc = accuracy_score(pred_values , y_test)
+    #     roc_auc = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr', average="macro")
+    #     f_measure = f1_score(y_test, pred_values,  average='macro')
 
-        roc_score.append(roc_auc)
-        acc_score.append(acc)
-        f_score.append(f_measure)
+    #     roc_score.append(roc_auc)
+    #     acc_score.append(acc)
+    #     f_score.append(f_measure)
+
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
+        os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+        cross_validate
+        cv_results = cross_validate(pipeline, features, target, cv=kf_part, scoring=('accuracy', 'f1_macro', 'roc_auc_ovr'),)
+        # pipeline.fit(X_train,y_train)
+
+    
     
     dump(pipeline, save_model_path)
     click.echo(f"Model is saved to {save_model_path}.")
+    click.echo(f"Cross-validation scores for different methrics :") 
+    click.echo(f"accuracy : {cv_results['test_accuracy'].mean()}.") 
+    click.echo(f"f1_score : {cv_results['test_f1_macro'].mean()}.")
+    click.echo(f"roc_auc : {cv_results['test_roc_auc_ovr'].mean()}.") 
 
-    click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
-    click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
-    click.echo(f"F score {sum(f_score)/len(f_score)}.") 
+    # click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
+    # click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
+    # click.echo(f"F score {sum(f_score)/len(f_score)}.") 
 
     # https://towardsdatascience.com/complete-guide-to-pythons-cross-validation-with-examples-a9676b5cac12
     # почитать про КФОЛД
