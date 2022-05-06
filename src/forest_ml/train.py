@@ -8,14 +8,16 @@ import os
 import warnings
 import pandas_profiling
 
+import mlflow.sklearn
+import mlflow
 
 
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
+# from sklearn.metrics import accuracy_score
+# from sklearn.metrics import roc_auc_score
 # from sklearn.metrics import make_scorer
-from sklearn.metrics import f1_score
+# from sklearn.metrics import f1_score
 from sklearn.model_selection import cross_validate
-from sklearn.model_selection import StratifiedKFold 
+# from sklearn.model_selection import StratifiedKFold 
 from .data import get_dataset
 from .data import get_data
 from .pipeline import create_pipeline
@@ -92,20 +94,22 @@ def train(
     logreg_c: float,
     kf_part: int,
 ) -> None:
+
+    # Старая функция чтения данных до кросс валидации
+
     # features_train, features_val, target_train, target_val = get_dataset(
     #     dataset_path,
     #     random_state,
     #     test_split_ratio)
+
+    # Новая функция чтения данных, перенесена вниз для удобства
     
-    features, target = get_dataset(dataset_path)
-
-    pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
-
-
-    # kf = StratifiedKFold(n_splits=kf_part, random_state=None)
-    
+    # features, target = get_dataset(dataset_path)
+    # pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
 
     # K-fold валидация рабочая с 3-мя метриками 
+
+    # kf = StratifiedKFold(n_splits=kf_part, random_state=None) 
 
     # acc_score = []
     # roc_score = []
@@ -129,21 +133,37 @@ def train(
     #     acc_score.append(acc)
     #     f_score.append(f_measure)
 
-    if not sys.warnoptions:
-        warnings.simplefilter("ignore")
-        os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
-        cross_validate
-        cv_results = cross_validate(pipeline, features, target, cv=kf_part, scoring=('accuracy', 'f1_macro', 'roc_auc_ovr'),)
-        # pipeline.fit(X_train,y_train)
+    features, target = get_dataset(dataset_path)
+
+    with mlflow.start_run():
+
+        pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
+
+        if not sys.warnoptions:
+            warnings.simplefilter("ignore")
+            os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+            cross_validate
+            cv_results = cross_validate(pipeline, features, target, cv=kf_part, scoring=('accuracy', 'f1_macro', 'roc_auc_ovr'),)
+
+        # Logging model parameters
+        mlflow.log_param("use_scaler", use_scaler)
+        mlflow.log_param("max_iter", max_iter)
+        mlflow.log_param("logreg_c", logreg_c)
+        mlflow.log_param("k_folds", kf_part)
+        
+        # Logging metrics
+        mlflow.log_param("accurasy", cv_results['test_accuracy'].mean())
+        mlflow.log_param("f1_score", cv_results['test_f1_macro'].mean())
+        mlflow.log_param("roc_auc ovr", cv_results['test_roc_auc_ovr'].mean())
 
     
     
-    dump(pipeline, save_model_path)
-    click.echo(f"Model is saved to {save_model_path}.")
-    click.echo(f"Cross-validation scores for different methrics :") 
-    click.echo(f"accuracy : {cv_results['test_accuracy'].mean()}.") 
-    click.echo(f"f1_score : {cv_results['test_f1_macro'].mean()}.")
-    click.echo(f"roc_auc : {cv_results['test_roc_auc_ovr'].mean()}.") 
+        dump(pipeline, save_model_path)
+        click.echo(f"Model is saved to {save_model_path}.")
+        click.echo(f"Cross-validation scores for different methrics :") 
+        click.echo(f"accuracy : {cv_results['test_accuracy'].mean()}.") 
+        click.echo(f"f1_score : {cv_results['test_f1_macro'].mean()}.")
+        click.echo(f"roc_auc : {cv_results['test_roc_auc_ovr'].mean()}.") 
 
     # click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
     # click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
