@@ -83,6 +83,35 @@ from .pipeline import create_pipeline
     show_default=True,
 )
 
+@click.option(
+    "--other-model",
+    default=False,
+    type=bool,
+    show_default=True,
+)
+
+@click.option(
+    "--criterion",
+    default="gini",
+    type=str,
+    show_default=True,
+)
+
+@click.option(
+    "--splitter",
+    default="best",
+    type=str,
+    show_default=True,
+)
+
+@click.option(
+    "--max-depth",
+    default=5,
+    type=int,
+    show_default=True,
+)
+
+
 
 def train(
     dataset_path: Path,
@@ -93,7 +122,25 @@ def train(
     max_iter: int,
     logreg_c: float,
     kf_part: int,
+    other_model: bool,
+    criterion: str,
+    splitter: str,
+    max_depth: int,
+
 ) -> None:
+
+
+
+
+
+
+# https://towardsdatascience.com/an-intuitive-guide-to-track-your-ml-experiments-with-mlflow-7ac50e63b09
+
+# Попробовать как там MLflow
+
+
+
+
 
     # Старая функция чтения данных до кросс валидации
 
@@ -137,7 +184,9 @@ def train(
 
     with mlflow.start_run():
 
-        pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
+        pipeline = create_pipeline(
+            use_scaler, max_iter, logreg_c, random_state, other_model, criterion, splitter, max_depth,
+            )
 
         if not sys.warnoptions:
             warnings.simplefilter("ignore")
@@ -146,15 +195,20 @@ def train(
             cv_results = cross_validate(pipeline, features, target, cv=kf_part, scoring=('accuracy', 'f1_macro', 'roc_auc_ovr'),)
 
         # Logging model parameters
-        mlflow.log_param("use_scaler", use_scaler)
-        mlflow.log_param("max_iter", max_iter)
-        mlflow.log_param("logreg_c", logreg_c)
-        mlflow.log_param("k_folds", kf_part)
-        
+        if other_model:
+            mlflow.log_param("criterion", criterion)
+            mlflow.log_param("splitter", splitter)
+            mlflow.log_param("max_depth", max_depth)
+        else:
+            mlflow.log_param("use_scaler", use_scaler)
+            mlflow.log_param("max_iter", max_iter)
+            mlflow.log_param("logreg_c", logreg_c)
+            mlflow.log_param("k_folds", kf_part)
+            
         # Logging metrics
-        mlflow.log_param("accurasy", cv_results['test_accuracy'].mean())
-        mlflow.log_param("f1_score", cv_results['test_f1_macro'].mean())
-        mlflow.log_param("roc_auc ovr", cv_results['test_roc_auc_ovr'].mean())
+        mlflow.log_metric("accurasy", cv_results['test_accuracy'].mean())
+        mlflow.log_metric("f1_score", cv_results['test_f1_macro'].mean())
+        mlflow.log_metric("roc_auc ovr", cv_results['test_roc_auc_ovr'].mean())
 
     
     
