@@ -27,3 +27,5 @@ poetry run eda
 ```sh 
 poetry run mlflow ui
 ```
+8. Example for tsak 8 from MLflow
+![Test Image 1](mlflow_screenshot.png)

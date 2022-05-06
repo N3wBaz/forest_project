@@ -184,6 +184,20 @@ def train(
 
     with mlflow.start_run():
 
+
+
+        # mlflow server \
+        #     --backend-store-uri sqlite:///mlflow.db \
+        #     --default-artifact-root ./artifacts \
+        #     --host 0.0.0.0
+        # And set MLFLOW_TRACKING_URI environment variable to http://localhost:5000 or
+
+        
+
+
+
+
+
         pipeline = create_pipeline(
             use_scaler, max_iter, logreg_c, random_state, other_model, criterion, splitter, max_depth,
             )
@@ -191,7 +205,7 @@ def train(
         if not sys.warnoptions:
             warnings.simplefilter("ignore")
             os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
-            cross_validate
+            # cross_validate
             cv_results = cross_validate(pipeline, features, target, cv=kf_part, scoring=('accuracy', 'f1_macro', 'roc_auc_ovr'),)
 
         # Logging model parameters
@@ -199,11 +213,14 @@ def train(
             mlflow.log_param("criterion", criterion)
             mlflow.log_param("splitter", splitter)
             mlflow.log_param("max_depth", max_depth)
+
         else:
             mlflow.log_param("use_scaler", use_scaler)
             mlflow.log_param("max_iter", max_iter)
             mlflow.log_param("logreg_c", logreg_c)
-            mlflow.log_param("k_folds", kf_part)
+
+        
+        mlflow.log_param("k_folds", kf_part)
             
         # Logging metrics
         mlflow.log_metric("accurasy", cv_results['test_accuracy'].mean())

@@ -14,7 +14,7 @@ def create_pipeline(
     if use_scaler:
         pipeline_steps.append(("scaler", MinMaxScaler()))
     if other_model:
-        print(criterion)
+        # print(criterion)
         pipeline_steps.append(
             (
                 "classifier",
