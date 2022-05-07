@@ -6,13 +6,19 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 
+
 def create_pipeline(
     use_scaler: bool, max_iter: int, logreg_C: float, random_state: int, other_model: bool,
-    criterion: str, splitter: str, max_depth: int,
+    criterion: str, splitter: str, max_depth: int
 ) -> Pipeline:
     pipeline_steps = []
+
     if use_scaler:
         pipeline_steps.append(("scaler", MinMaxScaler()))
+    
+
+
+
     if other_model:
         # print(criterion)
         pipeline_steps.append(

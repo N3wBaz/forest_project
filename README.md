@@ -27,5 +27,9 @@ poetry run eda
 ```sh 
 poetry run mlflow ui
 ```
-8. Example for tsak 8 from MLflow
-![Test Image 1](mlflow_screenshot.png)
+8. Screeshot for task 8 from MLflow
+![Test Image 1](mlflow_screenshot_all.png)
+    Part for LogisticRegression model with 3 different parameters and 2 feature engineering techniques (feature selection in this case)
+![Test Image 1](mlflow_screenshot_1.png)
+    Part for DecisionTree model with 3 different parameters and 2 feature engineering techniques (feature selection in this case)
+![Test Image 1](mlflow_screenshot_2.png)

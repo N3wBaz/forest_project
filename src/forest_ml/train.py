@@ -12,10 +12,6 @@ import mlflow.sklearn
 import mlflow
 
 
-# from sklearn.metrics import accuracy_score
-# from sklearn.metrics import roc_auc_score
-# from sklearn.metrics import make_scorer
-# from sklearn.metrics import f1_score
 from sklearn.model_selection import cross_validate
 # from sklearn.model_selection import StratifiedKFold 
 from .data import get_dataset
@@ -39,6 +35,13 @@ from .pipeline import create_pipeline
     type=click.Path(dir_okay=False, writable=True, path_type=Path),
     show_default=True
 
+)
+
+@click.option(
+    "--feature-select",
+    default=0,
+    type=int,
+    show_default=True
 )
 
 @click.option(
@@ -116,6 +119,7 @@ from .pipeline import create_pipeline
 def train(
     dataset_path: Path,
     save_model_path: Path,
+    feature_select: int,
     random_state: int,
     test_split_ratio: float,
     use_scaler: bool,
@@ -180,7 +184,15 @@ def train(
     #     acc_score.append(acc)
     #     f_score.append(f_measure)
 
-    features, target = get_dataset(dataset_path)
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
+        os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+
+        features, target = get_dataset(dataset_path, feature_select)
+
+
+
+    # mlflow.set_experiment(experiment_name="my_model")
 
     with mlflow.start_run():
 
@@ -199,7 +211,7 @@ def train(
 
 
         pipeline = create_pipeline(
-            use_scaler, max_iter, logreg_c, random_state, other_model, criterion, splitter, max_depth,
+            use_scaler, max_iter, logreg_c, random_state, other_model, criterion, splitter, max_depth
             )
 
         if not sys.warnoptions:
@@ -207,27 +219,29 @@ def train(
             os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
             # cross_validate
             cv_results = cross_validate(pipeline, features, target, cv=kf_part, scoring=('accuracy', 'f1_macro', 'roc_auc_ovr'),)
+        
+
 
         # Logging model parameters
         if other_model:
             mlflow.log_param("criterion", criterion)
             mlflow.log_param("splitter", splitter)
             mlflow.log_param("max_depth", max_depth)
+            mlflow.log_param("model_type", "DecisionTree")
 
         else:
             mlflow.log_param("use_scaler", use_scaler)
             mlflow.log_param("max_iter", max_iter)
             mlflow.log_param("logreg_c", logreg_c)
-
-        
+            mlflow.log_param("model_type", "LogisticRegression")
+             
+        mlflow.log_param("feature_select", feature_select)
         mlflow.log_param("k_folds", kf_part)
             
         # Logging metrics
         mlflow.log_metric("accurasy", cv_results['test_accuracy'].mean())
         mlflow.log_metric("f1_score", cv_results['test_f1_macro'].mean())
         mlflow.log_metric("roc_auc ovr", cv_results['test_roc_auc_ovr'].mean())
-
-    
     
         dump(pipeline, save_model_path)
         click.echo(f"Model is saved to {save_model_path}.")
@@ -235,6 +249,7 @@ def train(
         click.echo(f"accuracy : {cv_results['test_accuracy'].mean()}.") 
         click.echo(f"f1_score : {cv_results['test_f1_macro'].mean()}.")
         click.echo(f"roc_auc : {cv_results['test_roc_auc_ovr'].mean()}.") 
+    # mlflow.end_run()
 
     # click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
     # click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
