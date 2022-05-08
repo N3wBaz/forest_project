@@ -7,6 +7,7 @@ authors = ["Ruslan Romanov <ftnewt@gmail.com>"]
 [tool.poetry.scripts]
 train = "forest_ml.train:train"
 eda = "forest_ml.train:eda"
+train_nested_cv = "forest_ml.nested_cv:train_nested_cv"
 
 [tool.poetry.dependencies]
 python = "^3.8poetry"

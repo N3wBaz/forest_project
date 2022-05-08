@@ -114,6 +114,13 @@ from .pipeline import create_pipeline
     show_default=True,
 )
 
+@click.option(
+    "--nested-cv",
+    defeault=False,
+    type=bool,
+    show_default=True,
+)
+
 
 
 def train(
@@ -130,6 +137,7 @@ def train(
     criterion: str,
     splitter: str,
     max_depth: int,
+    nested_cv: bool,
 
 ) -> None:
 
@@ -294,6 +302,8 @@ def train(
     # accuracy = accuracy_score(pipeline.predict(features), target)
     # click.echo(f"Accuracy: {accuracy}.")
 
+
+
 @click.command()
 @click.option(
     "-d",
@@ -319,3 +329,7 @@ def eda(
     profile.to_file("Forest_report.html")
 
     # data.profile_report()
+
+
+
+
