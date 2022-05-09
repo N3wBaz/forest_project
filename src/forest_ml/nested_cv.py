@@ -17,6 +17,10 @@ import numpy as np
 from sklearn.model_selection import cross_validate
 from sklearn.model_selection import StratifiedKFold 
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_val_score
+
+from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
+
 from .data import get_dataset
 from .pipeline import create_pipeline
 from sklearn.linear_model import LogisticRegression
@@ -95,7 +99,7 @@ def train_nested_cv(
     # print("Best parameter (CV score=%0.3f):" % search.best_score_)
     # print(search.best_params_)
 
-    outer_loop = StratifiedKFold(n_splits=5, random_state=random_state, shuffle=True) 
+    outer_loop = StratifiedKFold(n_splits=2, random_state=random_state, shuffle=True) 
 
 
     clf1 = LogisticRegression(
@@ -154,12 +158,11 @@ def train_nested_cv(
     # print(gridcvs['Logreg'].best_params_)
     best_score = []
     best_models = {}
-
+    model_scores = {}
+    # metrics = ['accuracy', 'roc_auc_ovr', 'f1_macro',]
     for name in grid_search:
-        # print(name)
-        # print(gridcvs[name])
         best_models[name] = []
-
+        roc_score, acc_score, f_score = [], [], []
 
         for train_index , test_index in outer_loop.split(features, target):
             X_train , X_test = features.iloc[train_index,:], features.iloc[test_index,:]
@@ -167,21 +170,58 @@ def train_nested_cv(
             grid_search[name].fit(X_train, y_train)
             # print(gridcvs[name].best_params_)
             best_models[name].append(grid_search[name].best_params_)
-            best_score.append((name, grid_search[name].best_estimator_.score(X_test, y_test)))
+            # best_score.append((name, grid_search[name].best_estimator_.score(X_test, y_test)))
+            best_model = grid_search[name].best_estimator_
+            acc = accuracy_score(best_model.predict(X_test) , y_test)
+            roc_auc = roc_auc_score(y_test, best_model.predict_proba(X_test), multi_class='ovr', average="macro")
+            f_measure = f1_score(y_test, best_model.predict(X_test),  average='macro')
+
+            roc_score.append(roc_auc)
+            acc_score.append(acc)
+            f_score.append(f_measure)
+
+        model_scores[name] = {
+            'roc_auc_score' : np.array(roc_score).mean(),
+            'accuracy' : np.array(acc).mean(),
+            'f1_score' : np.array(f_measure).mean()
 
 
 
-    print(best_models)
-    for name in best_models:
-        for i, v in enumerate(best_models[name]):
-            print(f"{i + 1} модель      {v}   ")
-    for i in best_score:
-        print(f"{i[0]}            {i[1]}")
+        }
+
+    for name in model_scores:
+        print(f"{name}     {model_scores[name]}")
+
+
+
+        # for_test[name] = grid_search[name].best_params_
+        # scores = cross_val_score(
+        #     grid_search[name],
+        #     features, 
+        #     target, 
+        #     scoring=('accuracy'), 
+        #     cv=outer_loop, 
+        #     n_jobs=-1)
+        
+
+        # print(scores)
+    # print(best_models)
+    # for name in best_models:
+    #     for i, v in enumerate(best_models[name]):
+    #         print(f"{i + 1} модель      {v}   ")
+    # for i in best_score:
+    #     print(f"{i[0]}            {i[1]}")
+
+    # for name in for_test:
+    #     print(f"{name}     {for_test[name]}")
 
 
 
 
-
+# 1. Делаете NestedCV, получаете метрики, логируете в mlflow
+# 2. Забываете про все параметры и эстиматоры полученные в NestedCV.
+# 3. Делаете GridSearch на всех данных и получаете лучшие параметры.
+# 4. Обучаете эстиматор с лучшими параметрами. -> Это ваша лучшая модель
 
 
 
