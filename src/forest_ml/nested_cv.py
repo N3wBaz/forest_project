@@ -29,7 +29,7 @@ from .pipeline import create_pipeline
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import PowerTransformer
+from sklearn.preprocessing import PowerTransformer, StandardScaler
 
 
 @click.command()
@@ -130,32 +130,32 @@ def train_nested_cv(
 
 
     pipe1 = Pipeline([
-        ('scale', PowerTransformer()),
+        ('scale', StandardScaler()),
         ('clf1', clf1)])
 
-    pipe2 = Pipeline([('scale', PowerTransformer()),
+    pipe2 = Pipeline([('scale', StandardScaler()),
                     ('clf2', clf2)])
     
-    pipe3 = Pipeline([('scale', PowerTransformer()),
+    pipe3 = Pipeline([('scale', StandardScaler()),
                     ('clf3', clf3)])
     
-    pipe4 = Pipeline([('scale', PowerTransformer()),
+    pipe4 = Pipeline([('scale', StandardScaler()),
                     ('clf4', clf4)])
 
     param_grid1 = [{
         'clf1__penalty': ['l2', 'none'],
-        'clf1__C': np.power(10., np.arange(-4, 4))
+        'clf1__C': np.power(10., np.arange(-5, 5))
     }]
 
     param_grid2 = [{
-        'clf2__max_depth': [*range(1, 15)] + [None],
+        'clf2__max_depth': [*range(1, 20)] + [None],
         'clf2__splitter' : ['best', 'random'],
         'clf2__criterion': ['gini', 'entropy']
     }]
 
     param_grid3 = [{
-        'clf3__max_depth': [*range(1, 26, 2)] + [None],
-        'clf3__n_estimators' : [*range(10, 101, 10)],
+        'clf3__max_depth': [*range(1, 26)] + [None],
+        'clf3__n_estimators' : [*range(5, 101, 10)],
     }]
 
     param_grid4 = [{
@@ -168,55 +168,81 @@ def train_nested_cv(
     grid_search = {}
     inner_loop = StratifiedKFold(n_splits=2, shuffle=True, random_state=random_state)
 
-    for param_grid, estimator, name in zip((param_grid1, param_grid2, param_grid3, param_grid4),
-                                (pipe1, pipe2, pipe3, pipe4),
-                                ('Logreg', 'DcsnTree', 'Forest', 'K_neigoibors')):
-        search = GridSearchCV(estimator=estimator,
-                        param_grid=param_grid,
-                        scoring='accuracy',
-                        n_jobs=-1,
-                        cv=inner_loop,
-                        verbose=0,
-                        refit=True)
-        grid_search[name] = search
-    # print(gridcvs)
-    # gridcvs['Logreg'].fit(features, target)
-    # print(gridcvs['Logreg'].best_params_)
-    best_score = []
-    best_models = {}
-    model_scores = {}
-    # metrics = ['accuracy', 'roc_auc_ovr', 'f1_macro',]
-    for name in grid_search:
-        best_models[name] = []
-        roc_score, acc_score, f_score = [], [], []
+    with mlflow.start_run():
+        param_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
+        pipe = (pipe1, pipe2, pipe3, pipe4)
+        names =  ('LogReg', 'DcsnTree', 'RandForest', 'K_neigoibors')
+        # names =  ('LogReg', 'DcsnTree')
+        # param_grid = (param_grid1, param_grid2)
+        # pipe = (pipe1, pipe2)
 
-        for train_index , test_index in outer_loop.split(features, target):
-            X_train , X_test = features.iloc[train_index,:], features.iloc[test_index,:]
-            y_train , y_test = target[train_index] , target[test_index]
-            grid_search[name].fit(X_train, y_train)
-            # print(gridcvs[name].best_params_)
-            best_models[name].append(grid_search[name].best_params_)
-            # best_score.append((name, grid_search[name].best_estimator_.score(X_test, y_test)))
-            best_model = grid_search[name].best_estimator_
-            acc = accuracy_score(best_model.predict(X_test) , y_test)
-            roc_auc = roc_auc_score(y_test, best_model.predict_proba(X_test), multi_class='ovr', average="macro")
-            f_measure = f1_score(y_test, best_model.predict(X_test),  average='macro')
 
-            roc_score.append(roc_auc)
-            acc_score.append(acc)
-            f_score.append(f_measure)
-        print(f"{name}  :  roc_auc  : {np.array(roc_score).mean()}")
-        print(f"           f1_score : {np.array(f_measure).mean()}")
-        print(f"           accuracy : {np.array(acc).mean()}")
-        best_score.append(np.array(acc).mean())
-    idx = np.argmax(best_score)
-    model_key = list(grid_search)
-    print(f"best model : {model_key[idx]}       {grid_search[model_key[idx]].best_params_}")
+        for param_grid, estimator, name in zip(param_grid, pipe, names):
+            search = GridSearchCV(estimator=estimator,
+                            param_grid=param_grid,
+                            scoring='accuracy',
+                            n_jobs=-1,
+                            cv=inner_loop,
+                            verbose=0,
+                            refit=True)
+            grid_search[name] = search
+        # print(gridcvs)
+        # gridcvs['Logreg'].fit(features, target)
+        # print(gridcvs['Logreg'].best_params_)
+        best_score = []
+        # best_models = {}
 
-    final = grid_search[model_key[idx]]
-    final.fit(features, target)
-    acc_fin = accuracy_score(final.predict(features), target)
-    print(f"{acc_fin}") 
+
+        for name in grid_search:
+            # best_models[name] = []
+            roc_score, acc_score, f_score = [], [], []
+
+            for train_index , test_index in outer_loop.split(features, target):
+                X_train , X_test = features.iloc[train_index,:], features.iloc[test_index,:]
+                y_train , y_test = target[train_index] , target[test_index]
+                grid_search[name].fit(X_train, y_train)
+                # print(gridcvs[name].best_params_)
+                # best_models[name].append(grid_search[name].best_params_)
+                # best_score.append((name, grid_search[name].best_estimator_.score(X_test, y_test)))
+                best_model = grid_search[name].best_estimator_
+                acc = accuracy_score(best_model.predict(X_test) , y_test)
+                roc_auc = roc_auc_score(y_test, best_model.predict_proba(X_test), multi_class='ovr', average="macro")
+                f_measure = f1_score(y_test, best_model.predict(X_test),  average='macro')
+
+                roc_score.append(roc_auc)
+                acc_score.append(acc)
+                f_score.append(f_measure)
+            
+            with mlflow.start_run(nested=True):
+                mlflow.log_param("model_type", name)
+                mlflow.log_metric("accurasy", np.array(acc).mean())
+                mlflow.log_metric("roc_auc_ovr", np.array(roc_score).mean())
+                mlflow.log_metric("f1_score", np.array(f_measure).mean())
+
+            
+            print(f"{name}  :  roc_auc  : {np.array(roc_score).mean()}")
+            print(f"           f1_score : {np.array(f_measure).mean()}")
+            print(f"           accuracy : {np.array(acc).mean()}")
+            best_score.append(np.array(acc).mean())
+        idx = np.argmax(best_score)
+        model_key = list(grid_search)
+        print(f"best model : {model_key[idx]}       {grid_search[model_key[idx]].best_params_}")
+
+        final = grid_search[model_key[idx]].best_estimator_
+
+        final.fit(features, target)
+        mlflow.sklearn.log_model(final, artifact_path="best-model")
+        acc_fin = accuracy_score(final.predict(features), target)
+
+        dump(final, save_model_path)
+        click.echo(f"Model is saved to {save_model_path}.")
+
+        for key in grid_search[model_key[idx]].best_params_:
+            mlflow.log_param(key[6:],  grid_search[model_key[idx]].best_params_[key])
+        mlflow.log_param('feature_select',  feature_select)
+
+
+
     # param_grid = (param_grid1, param_grid2, param_grid3, param_grid4)[idx]
     # estimator = (pipe1, pipe2, pipe3, pipe4)[idx]
 
