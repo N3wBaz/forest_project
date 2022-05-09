@@ -203,20 +203,7 @@ def train(
     # mlflow.set_experiment(experiment_name="my_model")
 
     with mlflow.start_run():
-
-
-
-        # mlflow server \
-        #     --backend-store-uri sqlite:///mlflow.db \
-        #     --default-artifact-root ./artifacts \
-        #     --host 0.0.0.0
-        # And set MLFLOW_TRACKING_URI environment variable to http://localhost:5000 or
-
-        
-
-
-
-
+  
 
         pipeline = create_pipeline(
             use_scaler, max_iter, logreg_c, random_state, other_model, criterion, splitter, max_depth
@@ -257,7 +244,7 @@ def train(
         click.echo(f"accuracy : {cv_results['test_accuracy'].mean()}.") 
         click.echo(f"f1_score : {cv_results['test_f1_macro'].mean()}.")
         click.echo(f"roc_auc : {cv_results['test_roc_auc_ovr'].mean()}.") 
-    # mlflow.end_run()
+    mlflow.end_run()
 
     # click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
     # click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
@@ -269,38 +256,6 @@ def train(
 
 
 
-
-
-
-    # Отлавливаем ConvergenceWarning
-    # if not sys.warnoptions:
-    #     warnings.simplefilter("ignore")
-    #     os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
-    #     # model = pipeline.fit(features, target)
-    #     # scores = cross_validate(model, features, target, scoring=make_scorer(cus_roc_auc, greater_is_better=True), cv=3, n_jobs=-1)
-    #     scores = cross_val_score(pipeline, features, target, scoring="accuracy", cv = 5)
-
-
-    #     pipeline.fit(features, target)
-        
-    # Сохраняем модель
-    # dump(pipeline, save_model_path)
-    # click.echo(f"Model is saved to {save_model_path}.")
-    # click.echo(f"Model is saved to {scores}.") 
-
-    # # Считаем метрики 
-
-    # target_pred = pipeline.predict(features_val)
-
-    # roc_auc = roc_auc_score(target_val, pipeline.predict_proba(features_val), multi_class='ovr',)
-    # click.echo(f"ROC-AUC score: {roc_auc}.")
-
-    # f_measure = f1_score(target_val, target_pred,  average='macro')
-    # click.echo(f"F-measure: {f_measure}.")
-
-
-    # accuracy = accuracy_score(pipeline.predict(features), target)
-    # click.echo(f"Accuracy: {accuracy}.")
 
 
 
@@ -327,9 +282,3 @@ def eda(
     # profile.to_file(outputfile="data/profiling.html")
     # print(data)
     profile.to_file("Forest_report.html")
-
-    # data.profile_report()
-
-
-
-

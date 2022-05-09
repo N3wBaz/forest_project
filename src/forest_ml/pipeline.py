@@ -2,8 +2,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
-# from sklearn.preprocessing import StandardScaler, MinMaxScaler
-# from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.preprocessing import PowerTransformer
 
 
@@ -16,11 +15,11 @@ def create_pipeline(
     pipeline_steps = []
 
     if use_scaler:
-        # pipeline_steps.append(("scaler", StandardScaler()))
+
         pipeline_steps.append(("scaler", PowerTransformer()))
 
     if other_model:
-        # print(criterion)
+
         pipeline_steps.append(
             (
                 "classifier",
@@ -50,17 +49,3 @@ def create_pipeline(
         )        
 
     return Pipeline(steps=pipeline_steps)
-
-
-# def create_pipeline(
-#     use_scaler: bool, max_iter: int, logreg_C: float, random_state: int, other_model: bool,
-#     criterion: str, splitter: str, max_depth: int
-# ) -> Pipeline:
-#     pipeline_steps = []
-
-#     if use_scaler:
-#         # pipeline_steps.append(("scaler", StandardScaler()))
-#         pipeline_steps.append(("scaler", PowerTransformer()))
-
-  
-#     return Pipeline(steps=pipeline_steps)
