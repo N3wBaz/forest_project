@@ -122,7 +122,6 @@ from .pipeline import create_pipeline
 )
 
 
-
 def train(
     dataset_path: Path,
     save_model_path: Path,
@@ -146,51 +145,6 @@ def train(
 
 
 
-# https://towardsdatascience.com/an-intuitive-guide-to-track-your-ml-experiments-with-mlflow-7ac50e63b09
-
-# Попробовать как там MLflow
-
-
-
-
-
-    # Старая функция чтения данных до кросс валидации
-
-    # features_train, features_val, target_train, target_val = get_dataset(
-    #     dataset_path,
-    #     random_state,
-    #     test_split_ratio)
-
-    # Новая функция чтения данных, перенесена вниз для удобства
-    
-    # features, target = get_dataset(dataset_path)
-    # pipeline = create_pipeline(use_scaler, max_iter, logreg_c, random_state)
-
-    # K-fold валидация рабочая с 3-мя метриками 
-
-    # kf = StratifiedKFold(n_splits=kf_part, random_state=None) 
-
-    # acc_score = []
-    # roc_score = []
-    # f_score = []
-    
-    # for train_index , test_index in kf.split(features, target):
-    #     X_train , X_test = features.iloc[train_index,:],features .iloc[test_index,:]
-    #     y_train , y_test = target[train_index] , target[test_index]
-    #     if not sys.warnoptions:
-    #         warnings.simplefilter("ignore")
-    #         os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
-    #         pipeline.fit(X_train,y_train)
-
-    #     pred_values = pipeline.predict(X_test)
-        
-    #     acc = accuracy_score(pred_values , y_test)
-    #     roc_auc = roc_auc_score(y_test, pipeline.predict_proba(X_test), multi_class='ovr', average="macro")
-    #     f_measure = f1_score(y_test, pred_values,  average='macro')
-
-    #     roc_score.append(roc_auc)
-    #     acc_score.append(acc)
-    #     f_score.append(f_measure)
 
     if not sys.warnoptions:
         warnings.simplefilter("ignore")
@@ -198,9 +152,6 @@ def train(
 
         features, target = get_dataset(dataset_path, feature_select)
 
-
-
-    # mlflow.set_experiment(experiment_name="my_model")
 
     with mlflow.start_run():
   
@@ -244,7 +195,7 @@ def train(
         click.echo(f"accuracy : {cv_results['test_accuracy'].mean()}.") 
         click.echo(f"f1_score : {cv_results['test_f1_macro'].mean()}.")
         click.echo(f"roc_auc : {cv_results['test_roc_auc_ovr'].mean()}.") 
-    mlflow.end_run()
+    # mlflow.end_run()
 
     # click.echo(f"Roc auc score {sum(roc_score)/len(roc_score)}.") 
     # click.echo(f"Accuracy score {sum(acc_score)/len(acc_score)}.") 
@@ -256,6 +207,38 @@ def train(
 
 
 
+
+
+
+    # Отлавливаем ConvergenceWarning
+    # if not sys.warnoptions:
+    #     warnings.simplefilter("ignore")
+    #     os.environ["PYTHONWARNINGS"] = "ignore" # Also affect subprocesses
+    #     # model = pipeline.fit(features, target)
+    #     # scores = cross_validate(model, features, target, scoring=make_scorer(cus_roc_auc, greater_is_better=True), cv=3, n_jobs=-1)
+    #     scores = cross_val_score(pipeline, features, target, scoring="accuracy", cv = 5)
+
+
+    #     pipeline.fit(features, target)
+        
+    # Сохраняем модель
+    # dump(pipeline, save_model_path)
+    # click.echo(f"Model is saved to {save_model_path}.")
+    # click.echo(f"Model is saved to {scores}.") 
+
+    # # Считаем метрики 
+
+    # target_pred = pipeline.predict(features_val)
+
+    # roc_auc = roc_auc_score(target_val, pipeline.predict_proba(features_val), multi_class='ovr',)
+    # click.echo(f"ROC-AUC score: {roc_auc}.")
+
+    # f_measure = f1_score(target_val, target_pred,  average='macro')
+    # click.echo(f"F-measure: {f_measure}.")
+
+
+    # accuracy = accuracy_score(pipeline.predict(features), target)
+    # click.echo(f"Accuracy: {accuracy}.")
 
 
 
@@ -282,3 +265,9 @@ def eda(
     # profile.to_file(outputfile="data/profiling.html")
     # print(data)
     profile.to_file("Forest_report.html")
+
+    # data.profile_report()
+
+
+
+
