@@ -14,10 +14,13 @@ import numpy as np
 
 
 
-from sklearn.model_selection import cross_validate
 from sklearn.model_selection import StratifiedKFold 
 from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import cross_val_score
+
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
 
@@ -111,7 +114,6 @@ def train_nested_cv(
         random_state=1
     )
 
-
     clf2 = DecisionTreeClassifier(
         criterion='gini',
         splitter='best',
@@ -119,12 +121,26 @@ def train_nested_cv(
         random_state=random_state
     )
 
+    clf3 = RandomForestClassifier(
+        random_state=random_state
+    )
+
+    clf4 = KNeighborsClassifier()
+        
+
+
     pipe1 = Pipeline([
         ('scale', PowerTransformer()),
         ('clf1', clf1)])
 
-    pipe2 = Pipeline([('std', PowerTransformer()),
+    pipe2 = Pipeline([('scale', PowerTransformer()),
                     ('clf2', clf2)])
+    
+    pipe3 = Pipeline([('scale', PowerTransformer()),
+                    ('clf3', clf3)])
+    
+    pipe4 = Pipeline([('scale', PowerTransformer()),
+                    ('clf4', clf4)])
 
     param_grid1 = [{
         'clf1__penalty': ['l2', 'none'],
@@ -132,9 +148,19 @@ def train_nested_cv(
     }]
 
     param_grid2 = [{
-        'clf2__max_depth': [*range(1, 5)] + [None],
+        'clf2__max_depth': [*range(1, 15)] + [None],
         'clf2__splitter' : ['best', 'random'],
         'clf2__criterion': ['gini', 'entropy']
+    }]
+
+    param_grid3 = [{
+        'clf3__max_depth': [*range(1, 26, 2)] + [None],
+        'clf3__n_estimators' : [*range(10, 101, 10)],
+    }]
+
+    param_grid4 = [{
+        'clf4__n_neighbors': [*range(5, 106, 5)],
+        'clf4__p': [1, 2],
     }]
 
 
@@ -142,9 +168,9 @@ def train_nested_cv(
     grid_search = {}
     inner_loop = StratifiedKFold(n_splits=2, shuffle=True, random_state=random_state)
 
-    for param_grid, estimator, name in zip((param_grid1, param_grid2),
-                                (pipe1, pipe2),
-                                ('Logreg', 'DcsnTree')):
+    for param_grid, estimator, name in zip((param_grid1, param_grid2, param_grid3, param_grid4),
+                                (pipe1, pipe2, pipe3, pipe4),
+                                ('Logreg', 'DcsnTree', 'Forest', 'K_neigoibors')):
         search = GridSearchCV(estimator=estimator,
                         param_grid=param_grid,
                         scoring='accuracy',
@@ -179,18 +205,40 @@ def train_nested_cv(
             roc_score.append(roc_auc)
             acc_score.append(acc)
             f_score.append(f_measure)
+        print(f"{name}  :  roc_auc  : {np.array(roc_score).mean()}")
+        print(f"           f1_score : {np.array(f_measure).mean()}")
+        print(f"           accuracy : {np.array(acc).mean()}")
+        best_score.append(np.array(acc).mean())
+    idx = np.argmax(best_score)
+    model_key = list(grid_search)
+    print(f"best model : {model_key[idx]}       {grid_search[model_key[idx]].best_params_}")
 
-        model_scores[name] = {
-            'roc_auc_score' : np.array(roc_score).mean(),
-            'accuracy' : np.array(acc).mean(),
-            'f1_score' : np.array(f_measure).mean()
+    final = grid_search[model_key[idx]]
+    final.fit(features, target)
+    acc_fin = accuracy_score(final.predict(features), target)
+    print(f"{acc_fin}") 
+    # param_grid = (param_grid1, param_grid2, param_grid3, param_grid4)[idx]
+    # estimator = (pipe1, pipe2, pipe3, pipe4)[idx]
 
+    # search_final = GridSearchCV(estimator=estimator,
+    #                     param_grid=param_grid,
+    #                     scoring='accuracy',
+    #                     n_jobs=-1,
+    #                     cv=inner_loop,
+    #                     verbose=0,
+    #                     refit=True)
+    # for i, v in enumerate(grid_search):
+    #     print(grid_search[v].best_params_)
 
+        # model_scores[name] = {
+        #     'roc_auc_score' : np.array(roc_score).mean(),
+        #     'accuracy' : np.array(acc).mean(),
+        #     'f1_score' : np.array(f_measure).mean(
 
-        }
+        # }
 
-    for name in model_scores:
-        print(f"{name}     {model_scores[name]}")
+    # for name in model_scores:
+    #     print(f"{name}     {model_scores[name]}")
 
 
 
