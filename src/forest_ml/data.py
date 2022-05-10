@@ -48,7 +48,7 @@ def get_dataset(
 
 
 # for EDA
-def get_data(csv_path: Path) -> Tuple[pd.DataFrame]:
+def get_data(csv_path: Path) -> pd.DataFrame:
 
     data = pd.read_csv(csv_path)
 

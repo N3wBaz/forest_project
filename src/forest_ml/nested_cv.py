@@ -59,30 +59,6 @@ def train_nested_cv(
         os.environ["PYTHONWARNINGS"] = "ignore"  # Also affect subprocesses
 
         features, target = get_dataset(dataset_path, feature_select)
-    # pass
-
-    # pipeline = create_pipeline(
-    #     use_scaler=True,
-    #     max_iter=100,
-    #     logreg_c=1,
-    #     random_state=random_state,
-    #     other_model=False,
-    #     criterion='gini',
-    #     splitter='best',
-    #     max_depth='5'
-    # )
-
-    # logistic = LogisticRegression(max_iter=100, tol=0.1)
-    # scaler = PowerTransformer()
-    # pipe = Pipeline(steps=[("scaler", scaler), ("logistic", logistic)])
-
-    # param_grid = {
-    #     "logistic__C": np.logspace(-4, 4, 4),
-    # }
-    # search = GridSearchCV(pipe, param_grid, n_jobs=2)
-    # search.fit(features, target)
-    # print("Best parameter (CV score=%0.3f):" % search.best_score_)
-    # print(search.best_params_)
 
     outer_loop = StratifiedKFold(n_splits=2, random_state=random_state, shuffle=True)
 
@@ -137,15 +113,15 @@ def train_nested_cv(
         }
     ]
 
-    grid_search = {}
+    grid_search = dict()
     inner_loop = StratifiedKFold(n_splits=2, shuffle=True, random_state=random_state)
 
     with mlflow.start_run():
-        param_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
+        parameters_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
         pipe = (pipe1, pipe2, pipe3, pipe4)
         names = ("LogReg", "DcsnTree", "RandForest", "K_neigoibors")
 
-        for param_grid, estimator, name in zip(param_grid, pipe, names):
+        for param_grid, estimator, name in zip(parameters_grid, pipe, names):
             search = GridSearchCV(
                 estimator=estimator,
                 param_grid=param_grid,
@@ -157,11 +133,11 @@ def train_nested_cv(
             )
             grid_search[name] = search
 
-        best_score = []
+        best_score = list()
 
         for name in grid_search:
 
-            roc_score, acc_score, f_score = [], [], []
+            roc_score, acc_score, f_score = list(), list(), list()
 
             for train_index, test_index in outer_loop.split(features, target):
                 X_train, X_test = (
