@@ -4,8 +4,6 @@ from typing import Tuple
 
 import pandas as pd
 import numpy as np
-import click
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
 from boruta import BorutaPy
@@ -15,9 +13,6 @@ from sklearn.ensemble import RandomForestClassifier
 def get_dataset(
     csv_path: Path,
     feature_select: int,
-    # random_state: int,
-    # test_split_ratio: float
-    # ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
 ) -> Tuple[pd.DataFrame, pd.Series]:
 
     data = pd.read_csv(csv_path)

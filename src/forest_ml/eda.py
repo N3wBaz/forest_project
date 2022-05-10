@@ -2,10 +2,8 @@ import pandas_profiling
 
 
 from pathlib import Path
-from joblib import dump
 
 import click
-import pandas as pd
 import sys
 import os
 import warnings
