@@ -35,9 +35,7 @@ poetry run mlflow ui
 ![Test Image 1](mlflow_screenshot_2.png)
 
 
-12. 13. Result of checking with flaske8, black and mypy
+12-13. Result of checking with flaske8, black and mypy
 ![Test Image 1](mypy_black.png)
 
-
-![Test Image 1](mlflow_screenshot_2.png)
 
