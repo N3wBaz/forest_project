@@ -16,6 +16,17 @@ SQLAlchemy = ">=1.3.0"
 tz = ["python-dateutil"]
 
 [[package]]
+name = "argcomplete"
+version = "1.12.3"
+description = "Bash tab completion for argparse"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["coverage", "flake8", "pexpect", "wheel"]
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.0"
 description = "Atomic file writes."
@@ -182,6 +193,20 @@ description = "Cross-platform colored terminal text."
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+
+[[package]]
+name = "colorlog"
+version = "6.6.0"
+description = "Add colours to the output of Python's logging module."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+colorama = {version = "*", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 
 [[package]]
 name = "crashtest"
@@ -706,6 +731,24 @@ developer = ["pre-commit (>=2.18)", "mypy (>=0.942)"]
 doc = ["sphinx (>=4.5)", "pydata-sphinx-theme (>=0.8.1)", "sphinx-gallery (>=0.10)", "numpydoc (>=1.2)", "pillow (>=9.1)", "nb2plots (>=0.6)", "texext (>=0.6.6)"]
 extra = ["lxml (>=4.6)", "pygraphviz (>=1.9)", "pydot (>=1.4.2)", "sympy (>=1.10)"]
 test = ["pytest (>=7.1)", "pytest-cov (>=3.0)", "codecov (>=2.1)"]
+
+[[package]]
+name = "nox"
+version = "2022.1.7"
+description = "Flexible test automation."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+argcomplete = ">=1.9.4,<2.0"
+colorlog = ">=2.6.1,<7.0.0"
+packaging = ">=20.9"
+py = ">=1.4.0,<2.0.0"
+virtualenv = ">=14.0.0"
+
+[package.extras]
+tox_to_nox = ["jinja2", "tox"]
 
 [[package]]
 name = "numpy"
@@ -1480,12 +1523,16 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8poetry"
-content-hash = "f8764aa48c475c94faa22ffb843888aea23fd7024da5bdbdb1484bbf887155f4"
+content-hash = "d9db7a40481d64154f3804e5f3ad7302858f4c12fccaec6c0c2a2774c5b37c2c"
 
 [metadata.files]
 alembic = [
     {file = "alembic-1.7.7-py3-none-any.whl", hash = "sha256:29be0856ec7591c39f4e1cb10f198045d890e6e2274cf8da80cb5e721a09642b"},
     {file = "alembic-1.7.7.tar.gz", hash = "sha256:4961248173ead7ce8a21efb3de378f13b8398e6630fab0eb258dc74a8af24c58"},
+]
+argcomplete = [
+    {file = "argcomplete-1.12.3-py2.py3-none-any.whl", hash = "sha256:291f0beca7fd49ce285d2f10e4c1c77e9460cf823eef2de54df0c0fec88b0d81"},
+    {file = "argcomplete-1.12.3.tar.gz", hash = "sha256:2c7dbffd8c045ea534921e63b0be6fe65e88599990d8dc408ac8c542b72a5445"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
@@ -1611,6 +1658,10 @@ cloudpickle = [
 colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
+]
+colorlog = [
+    {file = "colorlog-6.6.0-py2.py3-none-any.whl", hash = "sha256:351c51e866c86c3217f08e4b067a7974a678be78f07f85fc2d55b8babde6d94e"},
+    {file = "colorlog-6.6.0.tar.gz", hash = "sha256:344f73204009e4c83c5b6beb00b3c45dc70fcdae3c80db919e0a4171d006fde8"},
 ]
 crashtest = [
     {file = "crashtest-0.3.1-py3-none-any.whl", hash = "sha256:300f4b0825f57688b47b6d70c6a31de33512eb2fa1ac614f780939aa0cf91680"},
@@ -2007,6 +2058,10 @@ mypy-extensions = [
 networkx = [
     {file = "networkx-2.8-py3-none-any.whl", hash = "sha256:1a1e8fe052cc1b4e0339b998f6795099562a264a13a5af7a32cad45ab9d4e126"},
     {file = "networkx-2.8.tar.gz", hash = "sha256:4a52cf66aed221955420e11b3e2e05ca44196b4829aab9576d4d439212b0a14f"},
+]
+nox = [
+    {file = "nox-2022.1.7-py3-none-any.whl", hash = "sha256:efee12f02d39405b16d68f60e7a06fe1fc450ae58669d6cdda8c7f48e3bae9e3"},
+    {file = "nox-2022.1.7.tar.gz", hash = "sha256:b375238cebb0b9df2fab74b8d0ce1a50cd80df60ca2e13f38f539454fcd97d7e"},
 ]
 numpy = [
     {file = "numpy-1.22.3-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:92bfa69cfbdf7dfc3040978ad09a48091143cffb778ec3b03fa170c494118d75"},

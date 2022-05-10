@@ -30,12 +30,14 @@ poetry run mlflow ui
 8. Screeshot for task 8 from MLflow
 ![Test Image 1](mlflow_screenshot_all.png)
     Part for LogisticRegression model with 3 different parameters and 2 feature engineering techniques (feature selection in this case)
-![Test Image 1](mlflow_screenshot_1.png)
+![Test Image 2](mlflow_screenshot_1.png)
     Part for DecisionTree model with 3 different parameters and 2 feature engineering techniques (feature selection in this case)
-![Test Image 1](mlflow_screenshot_2.png)
+![Test Image 3](mlflow_screenshot_2.png)
 
 
-12-13. Result of checking with flaske8, black and mypy
-![Test Image 1](mypy_black.png)
+12-13. Results of checking with flaske8, black and mypy
+![Test Image 4](mypy_black.png)
 
+14. Results of combine all checks in one with nox helping.
+![Test Image 5](nox_wo_tests.png)
 
