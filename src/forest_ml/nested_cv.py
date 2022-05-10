@@ -117,9 +117,13 @@ def train_nested_cv(
     inner_loop = StratifiedKFold(n_splits=2, shuffle=True, random_state=random_state)
 
     with mlflow.start_run():
-        parameters_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
-        pipe = (pipe1, pipe2, pipe3, pipe4)
-        names = ("LogReg", "DcsnTree", "RandForest", "K_neigoibors")
+        # parameters_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
+        # pipe = (pipe1, pipe2, pipe3, pipe4)
+        # names = ("LogReg", "DcsnTree", "RandForest", "K_neigoibors")
+
+        parameters_grid = (param_grid1, param_grid2)
+        pipe = (pipe1, pipe2)
+        names = ("LogReg", "DcsnTree")
 
         for param_grid, estimator, name in zip(parameters_grid, pipe, names):
             search = GridSearchCV(
@@ -157,7 +161,7 @@ def train_nested_cv(
                 f_measure = f1_score(
                     y_test, best_model.predict(X_test), average="macro"
                 )
-
+                
                 roc_score.append(roc_auc)
                 acc_score.append(acc)
                 f_score.append(f_measure)
@@ -165,7 +169,7 @@ def train_nested_cv(
             with mlflow.start_run(nested=True):
                 mlflow.log_param("model_type", name)
                 mlflow.log_metric("accurasy", np.array(acc).mean())
-                mlflow.log_metric("roc_auc_ovr", np.array(roc_score).mean())
+                mlflow.log_metric("roc_auc ovr", np.array(roc_score).mean())
                 mlflow.log_metric("f1_score", np.array(f_measure).mean())
 
             print(f"{name}  :  roc_auc  : {np.array(roc_score).mean()}")
@@ -189,3 +193,4 @@ def train_nested_cv(
         for key in grid_search[model_key[idx]].best_params_:
             mlflow.log_param(key[6:], grid_search[model_key[idx]].best_params_[key])
         mlflow.log_param("feature_select", feature_select)
+        mlflow.log_param("model_type", model_key[idx])

@@ -34,6 +34,9 @@ poetry run mlflow ui
     Part for DecisionTree model with 3 different parameters and 2 feature engineering techniques (feature selection in this case)
 ![Test Image 1](mlflow_screenshot_2.png)
 
+9. Screenshot for task 9 from Mlflow with Nested CV
+![Test Image 1](nested_cv.png)
+
 
 12-13. Results of checking with flaske8, black and mypy
 ![Test Image 1](mypy_black.png)
