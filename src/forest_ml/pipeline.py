@@ -6,11 +6,15 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.preprocessing import PowerTransformer
 
 
-
-
 def create_pipeline(
-    use_scaler: bool, max_iter: int, logreg_C: float, random_state: int, other_model: bool,
-    criterion: str, splitter: str, max_depth: int
+    use_scaler: bool,
+    max_iter: int,
+    logreg_C: float,
+    random_state: int,
+    other_model: bool,
+    criterion: str,
+    splitter: str,
+    max_depth: int,
 ) -> Pipeline:
     pipeline_steps = []
 
@@ -27,7 +31,7 @@ def create_pipeline(
                     splitter=splitter,
                     criterion=criterion,
                     max_depth=max_depth,
-                    random_state=random_state, 
+                    random_state=random_state,
                 ),
             )
         )
@@ -36,16 +40,16 @@ def create_pipeline(
             (
                 "classifier",
                 LogisticRegression(
-                    random_state=random_state, max_iter=max_iter, C=logreg_C, 
+                    random_state=random_state,
+                    max_iter=max_iter,
+                    C=logreg_C,
                 ),
                 # KNeighborsClassifier(n_neighbors=100, metric='hamming')
                 # braycurtis
                 # 0.9209816963265073.  canberra
-                # 
+                #
                 # braycurtis  0.9178923422292442.
-
-
             )
-        )        
+        )
 
     return Pipeline(steps=pipeline_steps)
