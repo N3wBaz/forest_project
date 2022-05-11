@@ -1,4 +1,5 @@
-![Build Status]()
+Code checking:
+[![Build Status](https://github.com/N3wBaz/forest_project/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/N3wBaz/forest_project/actions/workflows/checks.yml)
 
 Capstone homework project for RS School Machine Learning course.
 
