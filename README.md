@@ -96,5 +96,5 @@ poetry run nox
 
 14. Results of combine all checks in one with nox helping.
 
-![Test Image 1](nox_wo_tests.png)
+![Test Image 1](nox_tests.png)
 
