@@ -12,11 +12,15 @@ from typing import (
 )
 import nox
 from nox.sessions import (
-     Session,
+    Session,
 )
 
 
-nox.options.sessions = "black", "mypy", "flake8", #"tests"
+nox.options.sessions = (
+    "black",
+    "mypy",
+    "flake8",
+)  # "tests"
 nox.options.sessions = (
     "black",
     "mypy",

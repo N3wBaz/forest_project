@@ -48,10 +48,7 @@ from sklearn.preprocessing import PowerTransformer, StandardScaler
 )
 @click.option("--feature-select", default=0, type=int, show_default=True)
 @click.option(
-    "--random-state", 
-    default=42,
-    type=click.IntRange(0, inf),
-    show_default=True
+    "--random-state", default=42, type=click.IntRange(0, inf), show_default=True
 )
 def train_nested_cv(
     dataset_path: Path,

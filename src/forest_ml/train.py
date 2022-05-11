@@ -39,10 +39,7 @@ from .pipeline import create_pipeline
 )
 @click.option("--feature-select", default=0, type=int, show_default=True)
 @click.option(
-    "--random-state", 
-    default=42,
-    type=click.IntRange(0, inf),
-    show_default=True
+    "--random-state", default=42, type=click.IntRange(0, inf), show_default=True
 )
 @click.option(
     "--use-scaler",
