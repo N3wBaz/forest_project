@@ -36,6 +36,7 @@ def test_error_for_invalid_random_state(runner: CliRunner) -> None:
     assert result.exit_code == 2
     assert "Invalid value for '--random-state'" in result.output
 
+
 def test_error_for_invalid_random_state1(runner: CliRunner) -> None:
     """It fails when random state is negative."""
     result = runner.invoke(

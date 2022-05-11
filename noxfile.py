@@ -1,31 +1,33 @@
 """Nox sessions."""
 
-# import tempfile
-# from typing import Any
+# # import tempfile
+# # from typing import Any
 
+# # import nox
+# # from nox.sessions import Session
+
+# import tempfile
+# from typing import (
+#     Any,
+# )
 # import nox
-# from nox.sessions import Session
+# from nox.sessions import (
+#     Session,
+# )
+
+
+# nox.options.sessions = ("black", "mypy", "flake8", "my_test")
+
+# locations = "src", "noxfile.py"
 
 import tempfile
-from typing import (
-    Any,
-)
+from typing import Any
+
 import nox
-from nox.sessions import (
-    Session,
-)
+from nox.sessions import Session
 
 
-nox.options.sessions = (
-    "black",
-    "mypy",
-    "flake8",
-)  # "tests"
-nox.options.sessions = (
-    "black",
-    "mypy",
-    "flake8",
-)
+nox.options.sessions = "black", "flake8", "mypy", "tests"
 locations = "src", "noxfile.py"
 
 
@@ -72,10 +74,62 @@ def mypy(session: Session) -> None:
     session.run("mypy", *args)
 
 
-# @nox.session(python="3.9")
+# @nox.session(python="3.8")
+# def my_test(session: Session) -> None:
+#     """Type-check using tests."""
+#     args = session.posargs or locations
+#     session.run("poetry", "install", "--no-dev", external=True)
+#     install_with_constraints(session, "pytest")
+#     session.run(
+#         "pytest",
+#         *args,
+#     )
+
+# @nox.session(python="3.8")
 # def tests(session: Session) -> None:
 #     """Run the test suite."""
 #     args = session.posargs
-#     session.run("poetry", "install", "--no-dev", external=True)
+#     session.run("poetry", "install", external=True)
 #     install_with_constraints(session, "pytest")
 #     session.run("pytest", *args)
+
+
+# @nox.session(python="3.8")
+# def tests(session: Session) -> None:
+#     """Run the test suite."""
+#     args = session.posargs
+#     session.run("poetry", "install")
+
+#     install_with_constraints(
+#         session,
+#         "pytest",
+#         "click",
+#     )
+#     session.run("pytest", *args)
+
+
+@nox.session(python="3.8")
+def tests(session: Session) -> None:
+    """Run the test suite."""
+    session.install("poetry")
+    session.run("poetry", "install")
+    session.run("poetry", "run", "pytest")
+
+
+# python = "^3.8poetry"
+# pandas = "1.3.5"
+# click = "^8.1.3"
+# poetry = "^1.1.13"
+# scikit-learn = "^1.0.2"
+# pandas-profiling = "^3.2.0"
+# mlflow = "^1.25.1"
+# Boruta = "^0.3"
+# virtualenv = "^20.14.1"
+
+
+# [tool.poetry.dev-dependencies]
+# pytest = "^6.2.5"
+# black = "^22.3.0"
+# flake8 = "^4.0.1"
+# mypy = "^0.950"
+# nox = "^2022.1.7"

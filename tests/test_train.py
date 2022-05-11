@@ -36,17 +36,19 @@ def test_error_for_invalid_random_state(runner: CliRunner) -> None:
     assert result.exit_code == 2
     assert "Invalid value for '--random-state'" in result.output
 
+
 def test_error_for_invalid_random_state1(runner: CliRunner) -> None:
     """It fails when random state is negative."""
     result = runner.invoke(
         train,
         [
             "--random-state",
-           -1,
+            -1,
         ],
     )
     assert result.exit_code == 2
     assert "Invalid value for '--random-state'" in result.output
+
 
 def test_error_for_invalid_use_scaler(runner: CliRunner) -> None:
     """It fails when use scaler is not boolean."""
@@ -72,6 +74,7 @@ def test_error_for_invalid_max_iter(runner: CliRunner) -> None:
     )
     assert result.exit_code == 2
     assert "Invalid value for '--max-iter'" in result.output
+
 
 def test_error_for_invalid_max_iter1(runner: CliRunner) -> None:
     """It fails when use max iter is zero or negative."""
@@ -111,6 +114,7 @@ def test_error_for_invalid_kf_part(runner: CliRunner) -> None:
     assert result.exit_code == 2
     assert "Invalid value for '--kf-part'" in result.output
 
+
 def test_error_for_invalid_kf_part1(runner: CliRunner) -> None:
     """It fails when use k-fold split is zero or negative."""
     result = runner.invoke(
@@ -149,6 +153,7 @@ def test_error_for_invalid_max_depth(runner: CliRunner) -> None:
     )
     assert result.exit_code == 2
     assert "Invalid value for '--max-depth'" in result.output
+
 
 def test_error_for_invalid_max_depth1(runner: CliRunner) -> None:
     """It fails when use scaler is not string."""
