@@ -15,8 +15,8 @@ poetry install --no-dev
 Default list of options for train:
    * -d, --dataset-path     :   data/train.csv
    * -s, --save-model-path  :   data/model.joblib
-   * --feature-select       :   0 (0 - without any selection
-                                   1 - select with ExtraTreesClassifier
+   * --feature-select       :   0 (0 - without any selection,
+                                   1 - select with ExtraTreesClassifier,
                                    2 - select with Boruta)
    * --random-state         :   42
    * --use-scaler           :   True
@@ -42,8 +42,8 @@ poetry run train_nested_cv
 You can use defaul options or yours:
    * -d, --dataset-path     :   data/train.csv
    * -s, --save-model-path  :   data/model.joblib
-   * --feature-select       :   0 (0 - without any selection
-                                   1 - select with ExtraTreesClassifier
+   * --feature-select       :   0 (0 - without any selection,
+                                   1 - select with ExtraTreesClassifier,
                                    2 - select with Boruta)
    * --random-state         :   42
 
