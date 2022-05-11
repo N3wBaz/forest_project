@@ -87,6 +87,10 @@ or flake8:
 ```sh 
 poetry run flake8 src/forest_ml
 ```
+or mypy:
+```sh 
+poetry run mypy src/forest_ml
+```
 You can combine all checks and tests in one with nox:
 ```sh 
 poetry run nox
@@ -97,4 +101,3 @@ poetry run nox
 14. Results of combine all checks in one with nox helping.
 
 ![Test Image 1](nox_tests.png)
-
