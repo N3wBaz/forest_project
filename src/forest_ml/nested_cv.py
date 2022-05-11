@@ -78,17 +78,17 @@ def train_nested_cv(
         criterion="gini", splitter="best", max_depth=5, random_state=random_state
     )
 
-    # clf3 = RandomForestClassifier(random_state=random_state)
+    clf3 = RandomForestClassifier(random_state=random_state)
 
-    # clf4 = KNeighborsClassifier()
+    clf4 = KNeighborsClassifier()
 
     pipe1 = Pipeline([("scale", StandardScaler()), ("clf1", clf1)])
 
     pipe2 = Pipeline([("scale", StandardScaler()), ("clf2", clf2)])
 
-    # pipe3 = Pipeline([("scale", StandardScaler()), ("clf3", clf3)])
+    pipe3 = Pipeline([("scale", StandardScaler()), ("clf3", clf3)])
 
-    # pipe4 = Pipeline([("scale", StandardScaler()), ("clf4", clf4)])
+    pipe4 = Pipeline([("scale", StandardScaler()), ("clf4", clf4)])
 
     param_grid1 = [
         {"clf1__penalty": ["l2", "none"], "clf1__C": np.power(10.0, np.arange(-5, 5))}
@@ -102,31 +102,27 @@ def train_nested_cv(
         }
     ]
 
-    # param_grid3 = [
-    #     {
-    #         "clf3__max_depth": [*range(1, 26)] + [None],
-    #         "clf3__n_estimators": [*range(5, 101, 10)],
-    #     }
-    # ]
+    param_grid3 = [
+        {
+            "clf3__max_depth": [*range(1, 26)] + [None],
+            "clf3__n_estimators": [*range(5, 101, 10)],
+        }
+    ]
 
-    # param_grid4 = [
-    #     {
-    #         "clf4__n_neighbors": [*range(5, 106, 5)],
-    #         "clf4__p": [1, 2],
-    #     }
-    # ]
+    param_grid4 = [
+        {
+            "clf4__n_neighbors": [*range(5, 106, 5)],
+            "clf4__p": [1, 2],
+        }
+    ]
 
     grid_search = dict()
     inner_loop = StratifiedKFold(n_splits=2, shuffle=True, random_state=random_state)
 
     with mlflow.start_run():
-        # parameters_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
-        # pipe = (pipe1, pipe2, pipe3, pipe4)
-        # names = ("LogReg", "DcsnTree", "RandForest", "K_neigoibors")
-
-        parameters_grid = (param_grid1, param_grid2)
-        pipe = (pipe1, pipe2)
-        names = ("LogReg", "DcsnTree")
+        parameters_grid = (param_grid1, param_grid2, param_grid3, param_grid4)
+        pipe = (pipe1, pipe2, pipe3, pipe4)
+        names = ("LogReg", "DcsnTree", "RandForest", "K_neigoibors")
 
         for param_grid, estimator, name in zip(parameters_grid, pipe, names):
             search = GridSearchCV(
