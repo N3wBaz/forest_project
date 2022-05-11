@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from joblib import dump
+from math import inf
 
 import click
 
@@ -46,7 +47,12 @@ from sklearn.preprocessing import PowerTransformer, StandardScaler
     show_default=True,
 )
 @click.option("--feature-select", default=0, type=int, show_default=True)
-@click.option("--random-state", default=42, type=int, show_default=True)
+@click.option(
+    "--random-state", 
+    default=42,
+    type=click.IntRange(0, inf),
+    show_default=True
+)
 def train_nested_cv(
     dataset_path: Path,
     save_model_path: Path,
@@ -75,17 +81,17 @@ def train_nested_cv(
         criterion="gini", splitter="best", max_depth=5, random_state=random_state
     )
 
-    clf3 = RandomForestClassifier(random_state=random_state)
+    # clf3 = RandomForestClassifier(random_state=random_state)
 
-    clf4 = KNeighborsClassifier()
+    # clf4 = KNeighborsClassifier()
 
     pipe1 = Pipeline([("scale", StandardScaler()), ("clf1", clf1)])
 
     pipe2 = Pipeline([("scale", StandardScaler()), ("clf2", clf2)])
 
-    pipe3 = Pipeline([("scale", StandardScaler()), ("clf3", clf3)])
+    # pipe3 = Pipeline([("scale", StandardScaler()), ("clf3", clf3)])
 
-    pipe4 = Pipeline([("scale", StandardScaler()), ("clf4", clf4)])
+    # pipe4 = Pipeline([("scale", StandardScaler()), ("clf4", clf4)])
 
     param_grid1 = [
         {"clf1__penalty": ["l2", "none"], "clf1__C": np.power(10.0, np.arange(-5, 5))}
@@ -99,19 +105,19 @@ def train_nested_cv(
         }
     ]
 
-    param_grid3 = [
-        {
-            "clf3__max_depth": [*range(1, 26)] + [None],
-            "clf3__n_estimators": [*range(5, 101, 10)],
-        }
-    ]
+    # param_grid3 = [
+    #     {
+    #         "clf3__max_depth": [*range(1, 26)] + [None],
+    #         "clf3__n_estimators": [*range(5, 101, 10)],
+    #     }
+    # ]
 
-    param_grid4 = [
-        {
-            "clf4__n_neighbors": [*range(5, 106, 5)],
-            "clf4__p": [1, 2],
-        }
-    ]
+    # param_grid4 = [
+    #     {
+    #         "clf4__n_neighbors": [*range(5, 106, 5)],
+    #         "clf4__p": [1, 2],
+    #     }
+    # ]
 
     grid_search = dict()
     inner_loop = StratifiedKFold(n_splits=2, shuffle=True, random_state=random_state)
@@ -161,7 +167,7 @@ def train_nested_cv(
                 f_measure = f1_score(
                     y_test, best_model.predict(X_test), average="macro"
                 )
-                
+
                 roc_score.append(roc_auc)
                 acc_score.append(acc)
                 f_score.append(f_measure)

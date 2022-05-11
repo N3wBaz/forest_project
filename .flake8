@@ -2,5 +2,4 @@
 min_python_version = 3.8.0
 max-line-length = 88
 
-ignore =
-    F401,
+ignore = F401, F811

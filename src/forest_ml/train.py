@@ -8,6 +8,7 @@ import click
 import sys
 import os
 import warnings
+from math import inf
 
 
 import mlflow.sklearn
@@ -37,7 +38,12 @@ from .pipeline import create_pipeline
     show_default=True,
 )
 @click.option("--feature-select", default=0, type=int, show_default=True)
-@click.option("--random-state", default=42, type=int, show_default=True)
+@click.option(
+    "--random-state", 
+    default=42,
+    type=click.IntRange(0, inf),
+    show_default=True
+)
 @click.option(
     "--use-scaler",
     default=True,
@@ -47,7 +53,7 @@ from .pipeline import create_pipeline
 @click.option(
     "--max-iter",
     default=100,
-    type=int,
+    type=click.IntRange(True, inf),
     show_default=True,
 )
 @click.option(
@@ -59,7 +65,7 @@ from .pipeline import create_pipeline
 @click.option(
     "--kf-part",
     default=5,
-    type=int,
+    type=click.IntRange(True, inf),
     show_default=True,
 )
 @click.option(
@@ -83,7 +89,7 @@ from .pipeline import create_pipeline
 @click.option(
     "--max-depth",
     default=5,
-    type=int,
+    type=click.IntRange(True, inf),
     show_default=True,
 )
 def train(

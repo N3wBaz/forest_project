@@ -1,13 +1,22 @@
 """Nox sessions."""
 
+# import tempfile
+# from typing import Any
+
+# import nox
+# from nox.sessions import Session
+
 import tempfile
-from typing import Any
-
+from typing import (
+    Any,
+)
 import nox
-from nox.sessions import Session
+from nox.sessions import (
+     Session,
+)
 
 
-# nox.options.sessions = "black", "mypy", "tests"
+nox.options.sessions = "black", "mypy", "flake8", #"tests"
 nox.options.sessions = (
     "black",
     "mypy",

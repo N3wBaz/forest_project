@@ -18,12 +18,14 @@ scikit-learn = "^1.0.2"
 pandas-profiling = "^3.2.0"
 mlflow = "^1.25.1"
 Boruta = "^0.3"
+virtualenv = "^20.14.1"
+
 
 
 
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "^6.2.5"
 black = "^22.3.0"
 flake8 = "^4.0.1"
 mypy = "^0.950"
